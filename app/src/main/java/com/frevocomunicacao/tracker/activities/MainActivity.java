@@ -47,10 +47,11 @@ public class MainActivity extends BaseActivity {
         visitList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-                Intent i = new Intent(getApplicationContext(), FormActivity.class);
-                i.putExtra("mode", "edit");
-                i.putExtra("record", (Serializable) visits.get(position));
-                startActivity(i);
+                Bundle b = new Bundle();
+                b.putString("mode", "edit");
+                b.putSerializable("record", (Serializable) visits.get(position));
+
+                changeActivity(FormActivity.class, b);
             }
         });
 
@@ -61,9 +62,10 @@ public class MainActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), FormActivity.class);
-                i.putExtra("mode", "create");
-                startActivity(i);
+                Bundle b = new Bundle();
+                b.putString("mode", "create");
+
+                changeActivity(FormActivity.class, b);
             }
         });
 
