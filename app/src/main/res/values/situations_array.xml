@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="situations_array">
+        <item>Selecione uma ocorrência</item>
+        <item>Ocorrência 01</item>
+        <item>Ocorrência 02</item>
+        <item>Ocorrência 03</item>
+        <item>Ocorrência 04</item>
+        <item>Ocorrência 05</item>
+        <item>Ocorrência 06</item>
+        <item>Ocorrência 07</item>
+    </string-array>
+</resources>

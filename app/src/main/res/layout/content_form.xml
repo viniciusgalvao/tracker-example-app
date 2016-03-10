@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.frevocomunicacao.tracker.activities.FormActivity"
+    tools:showIn="@layout/activity_form">
+
+    <com.frevocomunicacao.tracker.widget.MultiSelectSpinner
+        android:id="@+id/situations_spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp" />
+
+    <EditText
+        android:id="@+id/edt_address_cep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/situations_spinner"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/edt_address_number"
+        android:hint="@string/edt_address_cep"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+
+    <EditText
+        android:id="@+id/edt_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address_cep"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/edt_address_number"
+        android:hint="@string/edt_address"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+
+    <EditText
+        android:id="@+id/edt_address_number"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address_cep"
+        android:layout_alignParentRight="true"
+        android:hint="@string/edt_address_number"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/edt_address_complement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address"
+        android:hint="@string/edt_address_complement"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/edt_address_neighborhood"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address_complement"
+        android:hint="@string/edt_address_neighborhood"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/edt_address_city"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address_neighborhood"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/edt_address_number"
+        android:hint="@string/edt_address_city"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/edt_address_state"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address_neighborhood"
+        android:layout_alignParentRight="true"
+        android:hint="@string/edt_address_state"
+        android:inputType="textCapSentences"
+        android:maxLines="1"
+        android:maxLength="2"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/edt_address_reference_point"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edt_address_city"
+        android:hint="@string/edt_address_reference_point"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/edt_observation"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@id/edt_address_reference_point"
+        android:singleLine="false"
+        android:hint="Observações"/>
+
+    <ImageView
+        android:id="@+id/thumb"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_below="@id/edt_observation"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:visibility="gone"
+        android:src="@android:drawable/ic_menu_camera"/>
+
+</RelativeLayout>

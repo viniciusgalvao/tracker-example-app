@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Tracker</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Senha (obrigatória)</string>
+    <string name="action_sign_in">Entrar</string>
+    <string name="action_sign_in_short">Entrando</string>
+
+    <string name="error_invalid_email">Endereço de email inválido</string>
+    <string name="error_invalid_password">Essa senha é muito curta</string>
+    <string name="error_incorrect_password">Senha incorreta</string>
+    <string name="error_field_required">Esse campo é requerido</string>
+
+    <string name="title_activity_main">@string/app_name</string>
+
+    <string name="navigation_drawer_open">Abrir navegação lateral</string>
+    <string name="navigation_drawer_close">Fechar navegação lateral</string>
+
+    <string name="action_logout">Sair</string>
+    <string name="action_camera">Tirar Foto</string>
+
+    <!-- Strings related to form -->
+    <string name="title_activity_form">Visita Extra</string>
+
+    <!-- form input -->
+    <string name="edt_address_cep">Cep</string>
+    <string name="edt_address">Endereço</string>
+    <string name="edt_address_number">Número</string>
+    <string name="edt_address_complement">Complemento</string>
+    <string name="edt_address_neighborhood">Bairro</string>
+    <string name="edt_address_city">Cidade</string>
+    <string name="edt_address_state">Estado</string>
+    <string name="edt_address_reference_point">Ponto de referência</string>
+
+    <!-- buttons -->
+    <string name="action_save">Salvar</string>
+
+</resources>

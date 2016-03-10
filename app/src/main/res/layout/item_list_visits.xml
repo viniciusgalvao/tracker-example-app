@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/txt_cep"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12dp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/txt_city_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/txt_cep"
+        android:layout_alignParentRight="true"
+        android:textSize="13dp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/txt_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/txt_cep"
+        android:textSize="14dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txt_reference_point"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/txt_address"
+        android:textSize="12dp"
+        android:textStyle="italic"/>
+
+</RelativeLayout>
