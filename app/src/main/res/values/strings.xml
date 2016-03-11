@@ -33,6 +33,9 @@
     <string name="edt_address_state">Estado</string>
     <string name="edt_address_reference_point">Ponto de referência</string>
 
+    <!-- TextViews -->
+    <string name="tv_label_occurrences">Selecione uma ou mais ocorrências</string>
+
     <!-- buttons -->
     <string name="action_save">Salvar</string>
 

@@ -12,6 +12,12 @@
     tools:context="com.frevocomunicacao.tracker.activities.FormActivity"
     tools:showIn="@layout/activity_form">
 
+    <TextView
+        android:id="@+id/tvOcurrencesLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tv_label_occurrences"/>
+
     <com.frevocomunicacao.tracker.widget.MultiSelectSpinner
         android:id="@+id/situations_spinner"
         android:layout_width="fill_parent"

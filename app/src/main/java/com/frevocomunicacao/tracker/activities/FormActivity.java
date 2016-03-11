@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frevocomunicacao.tracker.R;
@@ -35,10 +36,10 @@ public class FormActivity extends BaseActivity {
     private GpsTracker tracker;
     private Location mLocation;
 
-    private EditText edtAddressCep, edtAddress, edtAddressNumber,
-            edtAddressComplement, edtAddressNeighborhood,
-            edtAddressCity, edtAddressState,
-            edtAddressReferencePoint, edtObservation;
+    private EditText edtAddressCep, edtAddress, edtAddressNumber, edtAddressComplement, edtAddressNeighborhood, edtAddressCity,
+            edtAddressState, edtAddressReferencePoint, edtObservation;
+
+    private TextView tvOcurrencesLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,8 @@ public class FormActivity extends BaseActivity {
         edtAddressCity          = ((EditText) findViewById(R.id.edt_address_city));
         edtAddressState         = ((EditText) findViewById(R.id.edt_address_state));
         edtAddressReferencePoint= ((EditText) findViewById(R.id.edt_address_reference_point));
+
+        tvOcurrencesLabel       = ((TextView) findViewById(R.id.tvOcurrencesLabel));
 
         // activity view mode
         viewMode = getIntent().getExtras().getString("mode");
