@@ -39,6 +39,8 @@ public class MultiSelectSpinner extends Spinner implements OnMultiChoiceClickLis
 
     ArrayAdapter<String> _proxyAdapter;
 
+    String defaultLabel = "Selecione uma ou mais ocorrências";
+
     /**
      * Constructor for use when instantiating directly.
      * @param context
@@ -48,6 +50,8 @@ public class MultiSelectSpinner extends Spinner implements OnMultiChoiceClickLis
 
         _proxyAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item);
         super.setAdapter(_proxyAdapter);
+
+        _proxyAdapter.add(defaultLabel);
     }
 
     /**
@@ -60,6 +64,8 @@ public class MultiSelectSpinner extends Spinner implements OnMultiChoiceClickLis
 
         _proxyAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item);
         super.setAdapter(_proxyAdapter);
+
+        _proxyAdapter.add(defaultLabel);
     }
 
     /**
@@ -199,7 +205,7 @@ public class MultiSelectSpinner extends Spinner implements OnMultiChoiceClickLis
     private String buildSelectedItemString() {
         StringBuilder sb = new StringBuilder();
         boolean foundOne = false;
-
+        
         for (int i = 0; i < _items.length; ++i) {
             if (_selection[i]) {
                 if (foundOne) {
@@ -209,6 +215,10 @@ public class MultiSelectSpinner extends Spinner implements OnMultiChoiceClickLis
 
                 sb.append(_items[i]);
             }
+        }
+
+        if (!foundOne) {
+            sb.append(defaultLabel);
         }
 
         return sb.toString();
