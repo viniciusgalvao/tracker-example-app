@@ -39,7 +39,7 @@ public class FormActivity extends BaseActivity {
     private EditText edtAddressCep, edtAddress, edtAddressNumber, edtAddressComplement, edtAddressNeighborhood, edtAddressCity,
             edtAddressState, edtAddressReferencePoint, edtObservation;
 
-    private TextView tvOcurrencesLabel;
+    //private TextView tvOcurrencesLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,7 @@ public class FormActivity extends BaseActivity {
         edtAddressState         = ((EditText) findViewById(R.id.edt_address_state));
         edtAddressReferencePoint= ((EditText) findViewById(R.id.edt_address_reference_point));
 
-        tvOcurrencesLabel       = ((TextView) findViewById(R.id.tvOcurrencesLabel));
+        //tvOcurrencesLabel       = ((TextView) findViewById(R.id.tvOcurrencesLabel));
 
         // activity view mode
         viewMode = getIntent().getExtras().getString("mode");
