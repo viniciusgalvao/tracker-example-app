@@ -12,12 +12,6 @@
     tools:context="com.frevocomunicacao.tracker.activities.FormActivity"
     tools:showIn="@layout/activity_form">
 
-    <!--TextView
-        android:id="@+id/tvOcurrencesLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/tv_label_occurrences"/-->
-
     <com.frevocomunicacao.tracker.widget.MultiSelectSpinner
         android:id="@+id/situations_spinner"
         android:layout_width="fill_parent"
@@ -120,20 +114,34 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_below="@id/edt_address_reference_point"
-        android:singleLine="false"
+        android:inputType="textMultiLine"
+        android:lines="4"
+        android:maxLines="4"
         android:hint="Observações"/>
 
-    <ImageView
-        android:id="@+id/thumb"
+    <TextView
+        android:id="@+id/tvImgLabel"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/edt_observation"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:visibility="gone"
-        android:src="@android:drawable/ic_menu_camera"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="5dp"
+        android:textSize="15sp"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:text="Imagens"/>
+
+    <GridView
+        android:id="@+id/galley_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvImgLabel"
+        android:columnWidth="91dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="5dp"
+        android:horizontalSpacing="5dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center" />
 
 </RelativeLayout>

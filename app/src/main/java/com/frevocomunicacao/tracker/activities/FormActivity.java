@@ -12,21 +12,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frevocomunicacao.tracker.R;
+import com.frevocomunicacao.tracker.adapters.ImageAdapter;
 import com.frevocomunicacao.tracker.models.Visit;
 import com.frevocomunicacao.tracker.utils.GpsTracker;
 import com.frevocomunicacao.tracker.widget.MultiSelectSpinner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FormActivity extends BaseActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private Visit visit;
-    private ImageView thumb;
     private String mCurrentPhotoPath;
     private String viewMode;
 
@@ -39,7 +43,9 @@ public class FormActivity extends BaseActivity {
     private EditText edtAddressCep, edtAddress, edtAddressNumber, edtAddressComplement, edtAddressNeighborhood, edtAddressCity,
             edtAddressState, edtAddressReferencePoint, edtObservation;
 
-    //private TextView tvOcurrencesLabel;
+    private GridView galleryContainer;
+    private List<Bitmap> images;
+    private ImageAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +60,6 @@ public class FormActivity extends BaseActivity {
         edtAddressCity          = ((EditText) findViewById(R.id.edt_address_city));
         edtAddressState         = ((EditText) findViewById(R.id.edt_address_state));
         edtAddressReferencePoint= ((EditText) findViewById(R.id.edt_address_reference_point));
-
-        //tvOcurrencesLabel       = ((TextView) findViewById(R.id.tvOcurrencesLabel));
 
         // activity view mode
         viewMode = getIntent().getExtras().getString("mode");
@@ -79,6 +83,12 @@ public class FormActivity extends BaseActivity {
 
         }
 
+        // gallery
+        galleryContainer = (GridView) findViewById(R.id.galley_container);
+        images  = new ArrayList<Bitmap>();
+        adapter = new ImageAdapter(this, images);
+        galleryContainer.setAdapter(adapter);
+
         // actionbar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -99,8 +109,6 @@ public class FormActivity extends BaseActivity {
         spinner = (MultiSelectSpinner) findViewById(R.id.situations_spinner);
         spinner.setItems(new String[]{"Ocorrência 01", "Ocorrência 02", "Ocorrência 03", "Ocorrência 04", "Ocorrência 05"});
 
-        // thumb
-        thumb = (ImageView) findViewById(R.id.thumb);
     }
 
     @Override
@@ -139,8 +147,8 @@ public class FormActivity extends BaseActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            thumb.setVisibility(View.VISIBLE);
-            thumb.setImageBitmap(imageBitmap);
+            images.add(imageBitmap);
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -150,11 +158,13 @@ public class FormActivity extends BaseActivity {
      * @return void
      */
     private void isGpsEnabled() {
-        if (tracker.canGetLocation()) {
-            tracker.getLocation(); // get gps location
-            showLocationProgressDialog(); // show location dialog
-        } else {
-            tracker.showSettingsAlert(); // show request gps enable dialog
+        if (mLocation == null) {
+            if (tracker.canGetLocation()) {
+                tracker.getLocation(); // get gps location
+                showLocationProgressDialog(); // show location dialog
+            } else {
+                tracker.showSettingsAlert(); // show request gps enable dialog
+            }
         }
     }
 
