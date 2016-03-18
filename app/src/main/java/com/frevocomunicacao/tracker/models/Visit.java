@@ -3,17 +3,22 @@ package com.frevocomunicacao.tracker.models;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Visit implements Serializable {
 
-    private int id, employeeId;
+    private int _id, id, employeeId;
     private String motive, cep, state, city,
             address, neighborhood, complement,
             number, referencePoint, observation;
 
     private Date dateFinish;
     private String[] status = {"Selecione um status", "Aguardando", "Pendente", "Visitado"};
+
+    private List<VisitImages> images;
+    private List<Ocurrences> ocurrences;
 
     public Visit() {}
 
@@ -30,6 +35,17 @@ public class Visit implements Serializable {
         this.city           = city;
         this.state          = state;
         this.referencePoint = referencePoint;
+
+        this.images = new ArrayList<VisitImages>();
+        this.ocurrences = new ArrayList<Ocurrences>();
+    }
+
+    public int getLocalId() {
+        return this._id;
+    }
+
+    public void setLocalId(int _id) {
+        this._id = _id;
     }
 
     public int getId() {
@@ -147,5 +163,29 @@ public class Visit implements Serializable {
 
     public String getObservation() {
         return this.observation;
+    }
+
+    public List<VisitImages> getImages() {
+        return this.images;
+    }
+
+    public void setImages(List<VisitImages> images) {
+        this.images = images;
+    }
+
+    public void addImage(VisitImages object) {
+        this.images.add(object);
+    }
+
+    public List<Ocurrences> getOcurrences() {
+        return this.ocurrences;
+    }
+
+    public void setOcurrences(List<Ocurrences> ocurrences) {
+        this.ocurrences = ocurrences;
+    }
+
+    public void addOcurrence(Ocurrences object) {
+        this.ocurrences.add(object);
     }
 }

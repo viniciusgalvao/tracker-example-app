@@ -1,5 +1,7 @@
 package com.frevocomunicacao.tracker.activities;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 import com.frevocomunicacao.tracker.Constants;
 import com.frevocomunicacao.tracker.R;
 import com.frevocomunicacao.tracker.adapters.VisitsAdapter;
+import com.frevocomunicacao.tracker.fragments.VisitFragment;
 import com.frevocomunicacao.tracker.models.Visit;
 import com.frevocomunicacao.tracker.utils.PrefUtils;
 
@@ -30,32 +33,9 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
-    private List<Visit> visits;
-    private ListView visitList;
-    private VisitsAdapter adapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // listview
-        visitList   = (ListView) findViewById(R.id.visit_list);
-        visits      = new ArrayList<Visit>();
-        adapter     = new VisitsAdapter(this, visits);
-        visitList.setAdapter(adapter);
-
-        visitList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-                Bundle b = new Bundle();
-                b.putString("mode", "edit");
-                b.putSerializable("record", (Serializable) visits.get(position));
-
-                changeActivity(FormActivity.class, b);
-            }
-        });
-
-        populateList(); // REMOVE LATER
 
         // fab
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add);
@@ -65,7 +45,7 @@ public class MainActivity extends BaseActivity {
                 Bundle b = new Bundle();
                 b.putString("mode", "create");
 
-                changeActivity(FormActivity.class, b);
+                changeActivity(FormActivity.class, b, false);
             }
         });
 
@@ -73,6 +53,8 @@ public class MainActivity extends BaseActivity {
 
         TextView mUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvUsername);
         mUsername.setText(prefs.get(Constants.PREFS_KEY_USER_NAME));
+
+        displayView(new VisitFragment(), null);
     }
 
     @Override
@@ -106,22 +88,5 @@ public class MainActivity extends BaseActivity {
     @Override
     protected int getLayoutResource() {
         return R.layout.activity_main;
-    }
-
-    private void populateList() {
-        visits.add(new Visit(1, 1, "", "", "Rua João Fernandes Vieira", "", "Sala 02", "Parque Amorim", "Recife", "PE", "Proxímo ao bompreço da agamenon"));
-        visits.add(new Visit(2, 1, "", "53444-321", "Av.Conselheiro Aguiar", "1112", "Sala 15", "Boa Viagem", "Recife", "PE", "Em frente à auto nunes"));
-        visits.add(new Visit(3, 1, "", "53212-123", "Av.Domingos Ferreira", "421", "5 andar", "Boa Viagem", "Recife", "PE", "Em frente à o supermercado extra"));
-        visits.add(new Visit(4, 1, "", "51231-456", "Av.Agamenon Magalhães", "21", "Loja 10", "Espinheiro", "Recife", "PE", "Uma rua depois do cruzamento do derby"));
-        visits.add(new Visit(5, 1, "", "59874-729", "Av Mascarenhas de Moraes", "4321", "", "Imbiribeira", "Recife", "PE", "Junto a marçal auto-peças"));
-
-        visits.add(new Visit(1, 1, "", "50050-200", "Rua João Fernandes Vieira", "587", "Sala 02", "Parque Amorim", "Recife", "PE", "Proxímo ao bompreço da agamenon"));
-        visits.add(new Visit(2, 1, "", "53444-321", "Av.Conselheiro Aguiar", "1112", "Sala 15", "Boa Viagem", "Recife", "PE", "Em frente à auto nunes"));
-        visits.add(new Visit(3, 1, "", "53212-123", "Av.Domingos Ferreira", "421", "5 andar", "Boa Viagem", "Recife", "PE", "Em frente à o supermercado extra"));
-        visits.add(new Visit(4, 1, "", "51231-456", "Av.Agamenon Magalhães", "21", "Loja 10", "Espinheiro", "Recife", "PE", "Uma rua depois do cruzamento do derby"));
-        visits.add(new Visit(5, 1, "", "59874-729", "Av Mascarenhas de Moraes", "4321", "", "Imbiribeira", "Recife", "PE", "Junto a marçal auto-peças"));
-
-
-        visitList.deferNotifyDataSetChanged();
     }
 }

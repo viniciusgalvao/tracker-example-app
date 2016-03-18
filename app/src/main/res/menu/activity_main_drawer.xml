@@ -7,9 +7,9 @@
             android:icon="@drawable/ic_menu_home"
             android:title="Início" />
         <item
-            android:id="@+id/nav_account"
+            android:id="@+id/nav_my_visits"
             android:icon="@drawable/ic_menu_account"
-            android:title="Minha Conta" />
+            android:title="Visitas Realizadas" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_exit"

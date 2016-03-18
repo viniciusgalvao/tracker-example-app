@@ -1,5 +1,7 @@
 package com.frevocomunicacao.tracker.activities;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -12,6 +14,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.frevocomunicacao.tracker.R;
+import com.frevocomunicacao.tracker.fragments.MyVisitFragment;
+import com.frevocomunicacao.tracker.fragments.VisitFragment;
 import com.frevocomunicacao.tracker.utils.PrefUtils;
 
 /**
@@ -60,8 +64,12 @@ public abstract class BaseActivity extends AppCompatActivity {
                 // Handle navigation view item clicks here.
                 int id = item.getItemId();
 
-                if (id == R.id.nav_account) {
-                    Toast.makeText(getApplicationContext(), "Em desenvolvimento", Toast.LENGTH_SHORT).show();
+                if (id == R.id.nav_home) {
+                    setTitle(R.string.app_name);
+                    displayView(new VisitFragment(), null);
+                } else if (id == R.id.nav_my_visits) {
+                    setTitle("Visitas Realizadas");
+                    displayView(new MyVisitFragment(), null);
                 } else if (id == R.id.nav_logout) {
                     logout();
                 }
@@ -78,13 +86,30 @@ public abstract class BaseActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(iconRes);
     }
 
-    protected void changeActivity(Class<?> cls, Bundle extras) {
+    protected void changeActivity(Class<?> cls, Bundle extras, boolean isFinish) {
         Intent i = new Intent(this, cls);
         if (extras != null) {
             i.putExtras(extras);
         }
         startActivity(i);
-        finish();
+
+        if (isFinish) {
+            finish();
+        }
+    }
+
+    public void displayView(Fragment object, Bundle args) {
+        Fragment fragment = object;
+
+        if (fragment != null) {
+
+            if (args != null) {
+                fragment.setArguments(args);
+            }
+
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+        }
     }
 
     protected void showMessage(String message) {
@@ -95,7 +120,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (!prefs.isEmpty()) {
             prefs.empty();
         }
-        changeActivity(LoginActivity.class, null);
+        changeActivity(LoginActivity.class, null, true);
     }
 
     protected abstract int getLayoutResource();

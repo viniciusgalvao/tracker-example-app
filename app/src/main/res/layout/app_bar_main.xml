@@ -10,8 +10,12 @@
     <!-- toolbar -->
     <include layout="@layout/toolbar" />
 
-    <!-- content -->
-    <include layout="@layout/content_main" />
+    <!-- Framelayout to display Fragments -->
+    <FrameLayout
+        android:id="@+id/frame_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="48dp"/>
 
     <!-- float action button -->
     <android.support.design.widget.FloatingActionButton
