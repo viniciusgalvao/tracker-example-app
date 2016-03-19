@@ -2,6 +2,7 @@ package com.frevocomunicacao.tracker.activities;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -29,6 +30,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected NavigationView navigationView;
 
     protected PrefUtils prefs;
+
+    private Fragment mCurrentFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +61,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setCheckedItem(R.id.nav_home);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 // Handle navigation view item clicks here.
                 int id = item.getItemId();
 
-                if (id == R.id.nav_home) {
+                if (id == R.id.nav_home && mCurrentFragment.getClass() != VisitFragment.class) {
                     setTitle(R.string.app_name);
                     displayView(new VisitFragment(), null);
-                } else if (id == R.id.nav_my_visits) {
+                } else if (id == R.id.nav_my_visits && mCurrentFragment.getClass() != MyVisitFragment.class) {
                     setTitle("Visitas Realizadas");
                     displayView(new MyVisitFragment(), null);
                 } else if (id == R.id.nav_logout) {
@@ -99,16 +103,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void displayView(Fragment object, Bundle args) {
-        Fragment fragment = object;
+        mCurrentFragment = object;
 
-        if (fragment != null) {
+        if (mCurrentFragment != null) {
 
             if (args != null) {
-                fragment.setArguments(args);
+                mCurrentFragment.setArguments(args);
             }
 
             FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.frame_container, fragment).commit();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(R.animator.enter_anim, R.animator.exit_anim);
+            transaction.replace(R.id.frame_container, mCurrentFragment);
+            transaction.commit();
         }
     }
 
