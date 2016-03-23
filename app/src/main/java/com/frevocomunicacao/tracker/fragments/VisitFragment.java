@@ -13,7 +13,8 @@ import android.widget.ListView;
 import com.frevocomunicacao.tracker.R;
 import com.frevocomunicacao.tracker.activities.FormActivity;
 import com.frevocomunicacao.tracker.adapters.VisitsAdapter;
-import com.frevocomunicacao.tracker.models.Visit;
+import com.frevocomunicacao.tracker.database.DbHelper;
+import com.frevocomunicacao.tracker.database.models.Visit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,12 +26,18 @@ public class VisitFragment extends Fragment {
     private ListView visitList;
     private VisitsAdapter adapter;
 
+    // database
+    private DbHelper mDbHelper;
+
     public VisitFragment() {}
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_visit, container, false);
+
+        // database
+        mDbHelper = new DbHelper(getActivity());
 
         // listview
         visitList   = (ListView) rootView.findViewById(R.id.visit_list);
@@ -55,7 +62,7 @@ public class VisitFragment extends Fragment {
             }
         });
 
-        populateList(); // REMOVE LATER
+        // populateList();
 
         return rootView;
     }

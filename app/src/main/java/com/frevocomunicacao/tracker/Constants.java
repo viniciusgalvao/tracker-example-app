@@ -12,7 +12,6 @@ public class Constants {
     public static final String PREFS_KEY_USER_EMPLOYEE_ID = "employee_id";
     public static final String PREFS_KEY_USER_NAME = "name";
     public static final String PREFS_KEY_USER_EMAIL = "email";
-    public static final String PREFS_KEY_USER_ACCESS_TOKEN = "access_token";
 
     /* API RESPONSE KEYS */
     public static final String RESPONSE_KEY_ERROR = "error";
@@ -20,7 +19,9 @@ public class Constants {
 
     /* ENDPOINTS */
     public static final String ENDPOINT_LOGIN = "login";
-    public static final String ENDPOINT_SYNC  = "publish";
+    public static final String ENDPOINT_IMPORT_DATA = "import_data";
+    public static final String ENDPOINT_OCURRENCES = "import_ocurrences";
+    public static final String ENDPOINT_SYNC  = "synchronize";
 
 
 }

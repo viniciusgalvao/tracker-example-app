@@ -3,33 +3,34 @@ package com.frevocomunicacao.tracker.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.frevocomunicacao.tracker.database.models.VisitImage;
+
 import java.util.List;
 
 public class ImageAdapter extends BaseAdapter {
 
     private Context mContext;
-    private List<Bitmap> mImages;
+    private List<VisitImage> images;
 
-    public ImageAdapter(Context context, List<Bitmap> images) {
+    public ImageAdapter(Context context, List<VisitImage> images) {
         this.mContext = context;
-        this.mImages = images;
+        this.images = images;
     }
 
     @Override
     public int getCount() {
-        return mImages.size();
+        return images.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mImages.get(position);
+        return images.get(position);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageBitmap((Bitmap) mImages.get(position));
+        imageView.setImageBitmap((Bitmap) BitmapFactory.decodeFile(images.get(position).getSource()));
 
         return imageView;
     }

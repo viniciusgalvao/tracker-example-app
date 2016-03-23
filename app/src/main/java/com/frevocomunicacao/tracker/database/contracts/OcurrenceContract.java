@@ -1,13 +1,13 @@
-package com.frevocomunicacao.tracker.database;
+package com.frevocomunicacao.tracker.database.contracts;
 
 import android.provider.BaseColumns;
 
-public final class OcurrencesContract {
+public final class OcurrenceContract {
 
-    public OcurrencesContract() {}
+    public OcurrenceContract() {}
 
     public static abstract class OcurrenceEntry implements BaseColumns {
-        public static final String TABLE_NAME = "ocurrences";
+        public static final String TABLE_NAME               = "ocurrences";
         public static final String COLUMN_FIELD_ID          = "id";
         public static final String COLUMN_FIELD_NAME        = "name";
     }
@@ -16,13 +16,13 @@ public final class OcurrencesContract {
     private static final String INT_TYPE  = " INTEGER";
     private static final String COMMA_SEP = ",";
 
-    private static final String SQL_CREATE_ENTRIES =
+    public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + OcurrenceEntry.TABLE_NAME + " (" +
                     OcurrenceEntry._ID + " INTEGER PRIMARY KEY," +
                     OcurrenceEntry.COLUMN_FIELD_ID + INT_TYPE + COMMA_SEP +
-                    OcurrenceEntry.COLUMN_FIELD_NAME + TEXT_TYPE + COMMA_SEP +
+                    OcurrenceEntry.COLUMN_FIELD_NAME + TEXT_TYPE  +
             " )";
 
-    private static final String SQL_DELETE_ENTRIES =
+    public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + OcurrenceEntry.TABLE_NAME;
 }

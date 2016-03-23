@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.frevocomunicacao.tracker.R;
+import com.frevocomunicacao.tracker.api.TrackerRestClientUsage;
 import com.frevocomunicacao.tracker.fragments.MyVisitFragment;
 import com.frevocomunicacao.tracker.fragments.VisitFragment;
 import com.frevocomunicacao.tracker.utils.PrefUtils;

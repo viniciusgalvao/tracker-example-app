@@ -13,16 +13,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.frevocomunicacao.tracker.R;
 import com.frevocomunicacao.tracker.adapters.ImageAdapter;
-import com.frevocomunicacao.tracker.models.Visit;
+import com.frevocomunicacao.tracker.database.DbHelper;
+import com.frevocomunicacao.tracker.database.models.Visit;
+import com.frevocomunicacao.tracker.database.models.VisitImage;
 import com.frevocomunicacao.tracker.utils.GpsTracker;
+import com.frevocomunicacao.tracker.utils.ImageUtils;
 import com.frevocomunicacao.tracker.widget.MultiSelectSpinner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +46,11 @@ public class FormActivity extends BaseActivity {
             edtAddressState, edtAddressReferencePoint, edtObservation;
 
     private GridView galleryContainer;
-    private List<Bitmap> images;
+    private List<VisitImage> images;
     private ImageAdapter adapter;
+
+    // database
+    private DbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +90,7 @@ public class FormActivity extends BaseActivity {
 
         // gallery
         galleryContainer = (GridView) findViewById(R.id.galley_container);
-        images  = new ArrayList<Bitmap>();
+        images  = new ArrayList<VisitImage>();
         adapter = new ImageAdapter(this, images);
         galleryContainer.setAdapter(adapter);
 
@@ -98,6 +103,7 @@ public class FormActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "Em desenvolvimento.", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -107,8 +113,9 @@ public class FormActivity extends BaseActivity {
 
         // spinner
         spinner = (MultiSelectSpinner) findViewById(R.id.situations_spinner);
-        spinner.setItems(new String[]{"Ocorrência 01", "Ocorrência 02", "Ocorrência 03", "Ocorrência 04", "Ocorrência 05"});
 
+        // database
+        mDbHelper = new DbHelper(this);
     }
 
     @Override
@@ -145,9 +152,11 @@ public class FormActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            images.add(imageBitmap);
+            Bundle extras           = data.getExtras();
+            File imageFile          = ImageUtils.saveImage((Bitmap) extras.get("data"));
+            VisitImage visitImage  = new VisitImage(imageFile.getName(), imageFile.getAbsolutePath());
+
+            images.add(visitImage);
             adapter.notifyDataSetChanged();
         }
     }

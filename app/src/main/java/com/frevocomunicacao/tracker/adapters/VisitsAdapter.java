@@ -5,13 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.frevocomunicacao.tracker.R;
-import com.frevocomunicacao.tracker.models.Visit;
-
-import org.w3c.dom.Text;
+import com.frevocomunicacao.tracker.database.models.Visit;
 
 import java.util.List;
 

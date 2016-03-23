@@ -1,4 +1,4 @@
-package com.frevocomunicacao.tracker.models;
+package com.frevocomunicacao.tracker.database.models;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -9,16 +9,17 @@ import java.util.List;
 
 public class Visit implements Serializable {
 
-    private int _id, id, employeeId;
+    private int _id, id, employeeId, visitStatusId;
     private String motive, cep, state, city,
             address, neighborhood, complement,
-            number, referencePoint, observation;
+            number, referencePoint, phone, observation;
 
     private Date dateFinish;
     private String[] status = {"Selecione um status", "Aguardando", "Pendente", "Visitado"};
 
-    private List<VisitImages> images;
-    private List<Ocurrences> ocurrences;
+    private List<VisitImage> images;
+    private List<Ocurrence> ocurrences;
+    private List<Checkin> checkins;
 
     public Visit() {}
 
@@ -36,8 +37,9 @@ public class Visit implements Serializable {
         this.state          = state;
         this.referencePoint = referencePoint;
 
-        this.images = new ArrayList<VisitImages>();
-        this.ocurrences = new ArrayList<Ocurrences>();
+        this.images     = new ArrayList<VisitImage>();
+        this.ocurrences = new ArrayList<Ocurrence>();
+        this.checkins   = new ArrayList<Checkin>();
     }
 
     public int getLocalId() {
@@ -56,7 +58,7 @@ public class Visit implements Serializable {
         this.id = id;
     }
 
-    public int getEmplyeeId() {
+    public int getEmpolyeeId() {
         return employeeId;
     }
 
@@ -149,7 +151,7 @@ public class Visit implements Serializable {
         return df.format(this.dateFinish);
     }
 
-    private void setStatus(String[] status) {
+    public void setStatus(String[] status) {
         this.status = status;
     }
 
@@ -157,7 +159,23 @@ public class Visit implements Serializable {
         return this.address + ", " + this.number + " - " + this.neighborhood;
     }
 
-    private void setObservation(String observation) {
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPhone() {
+        return this.phone;
+    }
+
+    public void setVisitStatusId(int visitStatusId) {
+        this.visitStatusId = visitStatusId;
+    }
+
+    public int getVisitStatusId() {
+        return this.visitStatusId;
+    }
+
+    public void setObservation(String observation) {
         this.observation = observation;
     }
 
@@ -165,27 +183,39 @@ public class Visit implements Serializable {
         return this.observation;
     }
 
-    public List<VisitImages> getImages() {
+    public List<VisitImage> getImages() {
         return this.images;
     }
 
-    public void setImages(List<VisitImages> images) {
+    public void setImages(List<VisitImage> images) {
         this.images = images;
     }
 
-    public void addImage(VisitImages object) {
+    public void addImage(VisitImage object) {
         this.images.add(object);
     }
 
-    public List<Ocurrences> getOcurrences() {
+    public List<Ocurrence> getOcurrences() {
         return this.ocurrences;
     }
 
-    public void setOcurrences(List<Ocurrences> ocurrences) {
+    public void setOcurrences(List<Ocurrence> ocurrences) {
         this.ocurrences = ocurrences;
     }
 
-    public void addOcurrence(Ocurrences object) {
+    public void addOcurrence(Ocurrence object) {
         this.ocurrences.add(object);
+    }
+
+    public List<Checkin> getCheckins() {
+        return this.checkins;
+    }
+
+    public void setCheckins(List<Checkin> checkins) {
+        this.checkins = checkins;
+    }
+
+    public void addCheckin(Checkin object) {
+        this.checkins.add(object);
     }
 }

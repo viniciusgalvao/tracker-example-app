@@ -3,54 +3,46 @@ package com.frevocomunicacao.tracker.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.frevocomunicacao.tracker.Constants;
 import com.frevocomunicacao.tracker.R;
+import com.frevocomunicacao.tracker.api.TrackerRestClientUsage;
+import com.frevocomunicacao.tracker.database.datasources.OcurrencesDataSource;
+import com.frevocomunicacao.tracker.database.datasources.VisitsDataSource;
+import com.frevocomunicacao.tracker.database.models.Ocurrence;
+import com.frevocomunicacao.tracker.database.models.Visit;
 import com.frevocomunicacao.tracker.utils.ConnectionDetector;
-import com.frevocomunicacao.tracker.utils.PrefUtils;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity {
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
+public class LoginActivity extends BaseActivity {
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -61,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(getLayoutResource());
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
@@ -95,12 +87,9 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         if (!ConnectionDetector.isNetworkConnected(this)) {
-            Toast.makeText(this, "Sem conexão com internet.", Toast.LENGTH_SHORT).show();
+            showMessage("Verifique sua conexão com a internet!");
             return;
         }
 
@@ -142,9 +131,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            executeLogin();
         }
     }
 
@@ -192,62 +179,134 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    private void executeLogin(){
+        showProgress(true);
 
-        private final String mEmail;
-        private final String mPassword;
+        RequestParams p = new RequestParams();
+        p.put("email", mEmailView.getText().toString());
+        p.put("password", mPasswordView.getText().toString());
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
+        TrackerRestClientUsage.login(p, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                showProgress(false);
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+                try {
+                    if (response.getBoolean(Constants.RESPONSE_KEY_ERROR) == false) {
+                        // clear preferences
+                        prefs.empty();
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+                        // put new preferences data
+                        prefs.put(Constants.PREFS_KEY_USER_ID, response.getInt("user_id"));
+                        prefs.put(Constants.PREFS_KEY_USER_EMPLOYEE_ID, response.getInt("employee_id"));
+                        prefs.put(Constants.PREFS_KEY_USER_NAME, response.getString("name"));
+                        prefs.put(Constants.PREFS_KEY_USER_EMAIL, response.getString("email"));
 
-            // TODO: implements authentication code
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                PrefUtils prefs = new PrefUtils(getApplicationContext());
-
-                if(!prefs.isEmpty()) {
-                    prefs.empty();
+                        // import
+                        importData();
+                    } else {
+                        showMessage(response.getString(Constants.RESPONSE_KEY_MESSAGE));
+                        mPasswordView.requestFocus();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
-                prefs.put(Constants.PREFS_KEY_USER_NAME, mEmail);
+            }
 
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                finish();
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                if (statusCode == 404) {
+                    showMessage("Ops! endpoit do serviço não encontrado.");
+                } else if (statusCode == 500) {
+                    showMessage("Ops! não foi possível encontrar o servidor.");
+                }
+
+                showProgress(false);
+            }
+        });
+    }
+
+    private void importData() {
+        RequestParams p = new RequestParams();
+        p.put("employee_id", prefs.getInt(Constants.PREFS_KEY_USER_EMPLOYEE_ID));
+
+        TrackerRestClientUsage.importData(p, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                try {
+                    if (response.getBoolean(Constants.RESPONSE_KEY_ERROR) == false) {
+                        JSONArray ocurrences = response.getJSONArray("ocurrences");
+                        JSONArray visits     = response.getJSONArray("visits");
+
+                        // import data
+                        importOcurrences(ocurrences);
+                        importVisits(visits);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                changeActivity(MainActivity.class, null, true);
+            }
+        });
+    }
+
+    private void importOcurrences(JSONArray ocurrences) throws JSONException {
+        OcurrencesDataSource dsOcurrence = new OcurrencesDataSource(getApplicationContext());
+
+        for (int x = 0; x < ocurrences.length(); x++) {
+            JSONObject object = ocurrences.getJSONObject(x);
+            Ocurrence ocurrence = new Ocurrence(object.getInt("id"), object.getString("name"));
+
+            if (!dsOcurrence.exist(ocurrence)) {
+                dsOcurrence.create(ocurrence);
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                dsOcurrence.update(ocurrence);
             }
         }
 
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
+        dsOcurrence.close();
+    }
+
+    private void importVisits(JSONArray visits) throws JSONException{
+        VisitsDataSource dsVisit = new VisitsDataSource(getApplicationContext());
+
+        for (int x=0;x < visits.length();x++) {
+            JSONObject object = visits.getJSONObject(x);
+
+            Visit visit = new Visit();
+            visit.setId(object.getInt("id"));
+            visit.setEmployeeId(object.getInt("employee_id"));
+            visit.setMotive(object.getString("motive"));
+            visit.setCep(object.getString("cep"));
+            visit.setState(object.getString("state"));
+            visit.setCity(object.getString("city"));
+            visit.setAddress(object.getString("address"));
+            visit.setNeighborhood(object.getString("neighborhood"));
+            visit.setComplement(object.getString("complement"));
+            visit.setNumber(object.getString("number"));
+            visit.setReferencePoint(object.getString("reference_point"));
+            visit.setVisitStatusId(object.getInt("visit_status_id"));
+
+            if (!dsVisit.exist(visit)) {
+                dsVisit.create(visit);
+                Log.d("LoginActivity", "Visita Criada: " + visit.getAddress() + ", " + visit.getNumber() + " - " + visit.getCity());
+            } else {
+                Log.d("LoginActivity", "Visita Atualizada: " + visit.getAddress() + ", " + visit.getNumber() + " - " + visit.getCity());
+                dsVisit.update(visit);
+            }
         }
+
+        dsVisit.close();
+
+    }
+
+        @Override
+    protected int getLayoutResource() {
+        return R.layout.activity_login;
     }
 }
 

@@ -13,7 +13,7 @@ import android.widget.ListView;
 import com.frevocomunicacao.tracker.R;
 import com.frevocomunicacao.tracker.activities.FormActivity;
 import com.frevocomunicacao.tracker.adapters.VisitsAdapter;
-import com.frevocomunicacao.tracker.models.Visit;
+import com.frevocomunicacao.tracker.database.models.Visit;
 
 import java.io.Serializable;
 import java.util.ArrayList;

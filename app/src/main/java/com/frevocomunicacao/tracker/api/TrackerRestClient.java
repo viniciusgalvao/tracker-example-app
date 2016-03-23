@@ -7,7 +7,7 @@ import com.loopj.android.http.*;
  */
 public class TrackerRestClient {
 
-    private static final String BASE_URL    = "192.168.25.55/";
+    private static final String BASE_URL    = "http://192.168.25.55/tracker/api/";
     private static AsyncHttpClient client   = new AsyncHttpClient();
 
     public static void get(String endpoint, RequestParams params, AsyncHttpResponseHandler responseHandler) {
