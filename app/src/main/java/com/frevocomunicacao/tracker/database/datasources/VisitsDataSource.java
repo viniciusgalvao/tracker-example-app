@@ -19,7 +19,9 @@ public class VisitsDataSource {
     private SQLiteDatabase db;
     private DbHelper dbHelper;
     private String[] allColumns = {
+            VisitContract.VisitEntry._ID,
             VisitContract.VisitEntry.COLUMN_FIELD_ID,
+            VisitContract.VisitEntry.COLUMN_FIELD_VISIT_TYPE_ID,
             VisitContract.VisitEntry.COLUMN_FIELD_EMPLOYEE_ID,
             VisitContract.VisitEntry.COLUMN_FIELD_MOTIVE,
             VisitContract.VisitEntry.COLUMN_FIELD_CEP,
@@ -37,7 +39,6 @@ public class VisitsDataSource {
 
     public VisitsDataSource(Context context) {
         dbHelper = new DbHelper(context);
-        this.open();
     }
 
     public void open() throws SQLException {
@@ -48,19 +49,22 @@ public class VisitsDataSource {
         dbHelper.close();
     }
 
-    public boolean create(Visit object) {
+    public long create(Visit object) {
+        this.open();
+
         ContentValues values = new ContentValues();
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ID, object.getId());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_EMPLOYEE_ID, object.getEmpolyeeId());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_MOTIVE, object.getMotive());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CEP, object.getCep());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_STATE, object.getState());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CITY, object.getCity());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ADDRESS, object.getAddress());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NEIGHBORHOOD, object.getNeighborhood());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_COMPLEMENT, object.getComplement());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NUMBER, object.getNumber());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_REF_POINT, object.getReferencePoint());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ID             , object.getId());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_VISIT_TYPE_ID  , object.getVisitTypeId());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_EMPLOYEE_ID    , object.getEmpolyeeId());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_MOTIVE         , object.getMotive());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CEP            , object.getCep());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_STATE          , object.getState());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CITY           , object.getCity());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ADDRESS        , object.getAddress());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NEIGHBORHOOD   , object.getNeighborhood());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_COMPLEMENT     , object.getComplement());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NUMBER         , object.getNumber());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_REF_POINT      , object.getReferencePoint());
         values.put(VisitContract.VisitEntry.COLUMN_FIELD_VISIT_STATUS_ID, object.getVisitStatusId());
 
         long insertId = db.insert(
@@ -68,52 +72,73 @@ public class VisitsDataSource {
                 null,
                 values);
 
-        return insertId != 0 ? true : false;
+        this.close();
+
+        return insertId;
     }
 
-    public void update(Visit object) {
+    public int update(Visit object) {
+        this.open();
+
         ContentValues values = new ContentValues();
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ID, object.getId());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_EMPLOYEE_ID, object.getEmpolyeeId());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_MOTIVE, object.getMotive());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CEP, object.getCep());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_STATE, object.getState());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CITY, object.getCity());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ADDRESS, object.getAddress());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NEIGHBORHOOD, object.getNeighborhood());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_COMPLEMENT, object.getComplement());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NUMBER, object.getNumber());
-        values.put(VisitContract.VisitEntry.COLUMN_FIELD_REF_POINT, object.getReferencePoint());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ID             , object.getId());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_VISIT_TYPE_ID  , object.getVisitTypeId());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_EMPLOYEE_ID    , object.getEmpolyeeId());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_MOTIVE         , object.getMotive());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CEP            , object.getCep());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_STATE          , object.getState());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_CITY           , object.getCity());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_ADDRESS        , object.getAddress());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NEIGHBORHOOD   , object.getNeighborhood());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_COMPLEMENT     , object.getComplement());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_NUMBER         , object.getNumber());
+        values.put(VisitContract.VisitEntry.COLUMN_FIELD_REF_POINT      , object.getReferencePoint());
         values.put(VisitContract.VisitEntry.COLUMN_FIELD_VISIT_STATUS_ID, object.getVisitStatusId());
-        //values.put(VisitContract.VisitEntry.COLUMN_FIELD_, object.get);
 
         // query
         String selection = VisitContract.VisitEntry.COLUMN_FIELD_ID + " = ?";
-        String[] selectionArgs = { String.valueOf(object.getLocalId()) };
+        String[] selectionArgs = { String.valueOf(object.getId()) };
 
+        // exec
         int count = db.update(
                 VisitContract.VisitEntry.TABLE_NAME,
                 values,
                 selection,
                 selectionArgs);
+
+        this.close();
+
+        return count;
     }
 
     public void delete(Visit object) {
+        this.open();
+
         db.delete(VisitContract.VisitEntry.TABLE_NAME, VisitContract.VisitEntry.COLUMN_FIELD_ID
                 + " = " + object.getId(), null);
+
+        this.close();
     }
 
     public boolean exist(Visit object) {
+        this.open();
+
         String q = VisitContract.VisitEntry.COLUMN_FIELD_ID + " = ?";
 
         if (this.find(q, new String[]{String.valueOf(object.getId())}) != null) {
+            this.close();
+
             return true;
         }
+
+        this.close();
 
         return false;
     }
 
     public Visit find(String query, String[] args) {
+        this.open();
+
         Visit object = null;
 
         Cursor cursor = db.query(
@@ -132,12 +157,15 @@ public class VisitsDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return object;
     }
 
     public List<Visit> findAll(String query, String[] args, String sortOrder) {
+        this.open();
+
         List<Visit> visits = new ArrayList<Visit>();
 
         Cursor cursor = db.query(
@@ -162,6 +190,7 @@ public class VisitsDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return visits;
@@ -172,7 +201,9 @@ public class VisitsDataSource {
         Visit visit = new Visit();
 
         // fill data
+        visit.setLocalId(cursor.getLong(cursor.getColumnIndex(VisitContract.VisitEntry._ID)));
         visit.setId(cursor.getInt(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_ID)));
+        visit.setVisitTypeId(cursor.getInt(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_VISIT_TYPE_ID)));
         visit.setEmployeeId(cursor.getInt(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_EMPLOYEE_ID)));
         visit.setMotive(cursor.getString(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_MOTIVE)));
         visit.setCep(cursor.getString(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_CEP)));
@@ -185,9 +216,16 @@ public class VisitsDataSource {
         visit.setReferencePoint(cursor.getString(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_REF_POINT)));
         visit.setPhone(cursor.getString(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_PHONE)));
         visit.setVisitStatusId(cursor.getInt(cursor.getColumnIndex(VisitContract.VisitEntry.COLUMN_FIELD_VISIT_STATUS_ID)));
-       // visit.setDateFinish(new Date(""));
 
         // return object
         return visit;
+    }
+
+    public void truncateTable() {
+        this.open();
+
+        db.execSQL("DELETE FROM " + VisitContract.VisitEntry.TABLE_NAME);
+
+        this.close();
     }
 }

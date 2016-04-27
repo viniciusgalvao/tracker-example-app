@@ -23,5 +23,9 @@ public class Constants {
     public static final String ENDPOINT_OCURRENCES = "import_ocurrences";
     public static final String ENDPOINT_SYNC  = "synchronize";
 
+    /* FRAGMENTS VIEW TYPE */
+    public static final int FRAGMENT_VIEW_STATUS_VISITS_LIST = 1;
+    public static final int FRAGMENT_VIEW_STATUS_MY_VISITS_LIST = 3;
+
 
 }

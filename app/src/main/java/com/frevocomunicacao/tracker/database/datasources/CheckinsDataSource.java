@@ -8,11 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.frevocomunicacao.tracker.database.DbHelper;
 import com.frevocomunicacao.tracker.database.contracts.CheckinContract;
-import com.frevocomunicacao.tracker.database.contracts.ImageContract;
-import com.frevocomunicacao.tracker.database.contracts.OcurrenceContract;
 import com.frevocomunicacao.tracker.database.models.Checkin;
-import com.frevocomunicacao.tracker.database.models.Ocurrence;
-import com.frevocomunicacao.tracker.database.models.VisitImage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +35,6 @@ public class CheckinsDataSource {
 
     public CheckinsDataSource(Context context) {
         dbHelper = new DbHelper(context);
-        this.open();
     }
 
     public void open() throws SQLException {
@@ -51,6 +46,8 @@ public class CheckinsDataSource {
     }
 
     public boolean create(Checkin object) {
+        this.open();
+
         ContentValues values = new ContentValues();
         values.put(CheckinContract.CheckinEntry.COLUMN_FIELD_VISIT_ID, object.getVisitId());
         values.put(CheckinContract.CheckinEntry.COLUMN_FIELD_VISIT_STATUS_ID, object.getVisitStatusId());
@@ -66,10 +63,14 @@ public class CheckinsDataSource {
                 null,
                 values);
 
+        this.close();
+
         return insertId != 0 ? true : false;
     }
 
-    public void update(Checkin object) {
+    public int update(Checkin object) {
+        this.open();
+
         ContentValues values = new ContentValues();
         values.put(CheckinContract.CheckinEntry.COLUMN_FIELD_VISIT_ID, object.getVisitId());
         values.put(CheckinContract.CheckinEntry.COLUMN_FIELD_VISIT_STATUS_ID, object.getVisitStatusId());
@@ -89,24 +90,39 @@ public class CheckinsDataSource {
                 values,
                 selection,
                 selectionArgs);
+
+        this.close();
+
+        return count;
     }
 
     public void delete(Checkin object) {
+        this.open();
+
         db.delete(CheckinContract.CheckinEntry.TABLE_NAME, CheckinContract.CheckinEntry.COLUMN_FIELD_ID
                 + " = " + object.getId(), null);
+
+        this.close();
     }
 
     public boolean exist(Checkin object) {
+        this.open();
+
         String q = CheckinContract.CheckinEntry.COLUMN_FIELD_ID + " = ?";
 
         if (this.find(q, new String[]{String.valueOf(object.getId())}) != null) {
+            this.close();
             return true;
         }
+
+        this.close();
 
         return false;
     }
 
     public Checkin find(String query, String[] args) {
+        this.open();
+
         Checkin object = null;
 
         Cursor cursor = db.query(
@@ -125,12 +141,15 @@ public class CheckinsDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return object;
     }
 
     public List<Checkin> findAll(String query, String[] args, String sortOrder) {
+        this.open();
+
         List<Checkin> checkins = new ArrayList<Checkin>();
 
         Cursor cursor = db.query(
@@ -155,6 +174,7 @@ public class CheckinsDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return checkins;
@@ -170,5 +190,14 @@ public class CheckinsDataSource {
 
         // return object
         return checkin;
+    }
+
+    public void truncateTable() {
+        this.open();
+
+        // truncate sql
+        db.execSQL("DELETE FROM " + CheckinContract.CheckinEntry.TABLE_NAME);
+
+        this.close();
     }
 }

@@ -9,7 +9,8 @@ import java.util.List;
 
 public class Visit implements Serializable {
 
-    private int _id, id, employeeId, visitStatusId;
+    private long _id;
+    private int id, employeeId, visitStatusId, visitTypeId;
     private String motive, cep, state, city,
             address, neighborhood, complement,
             number, referencePoint, phone, observation;
@@ -42,11 +43,11 @@ public class Visit implements Serializable {
         this.checkins   = new ArrayList<Checkin>();
     }
 
-    public int getLocalId() {
+    public long getLocalId() {
         return this._id;
     }
 
-    public void setLocalId(int _id) {
+    public void setLocalId(long _id) {
         this._id = _id;
     }
 
@@ -56,6 +57,14 @@ public class Visit implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getVisitTypeId() {
+        return this.visitTypeId;
+    }
+
+    public void setVisitTypeId(int visitTypeId) {
+        this.visitTypeId = visitTypeId;
     }
 
     public int getEmpolyeeId() {
@@ -135,7 +144,7 @@ public class Visit implements Serializable {
     }
 
     public void setReferencePoint(String referencePoint) {
-        this.referencePoint = referencePoint;
+        this.referencePoint = "null".equals(referencePoint) || referencePoint.equals("") ? "" : referencePoint;
     }
 
     public String[] getStatus() {

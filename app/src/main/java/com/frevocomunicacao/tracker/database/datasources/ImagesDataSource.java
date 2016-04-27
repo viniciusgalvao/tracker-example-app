@@ -7,11 +7,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.frevocomunicacao.tracker.database.DbHelper;
+import com.frevocomunicacao.tracker.database.contracts.CheckinContract;
 import com.frevocomunicacao.tracker.database.contracts.ImageContract;
-import com.frevocomunicacao.tracker.database.contracts.OcurrenceContract;
 import com.frevocomunicacao.tracker.database.contracts.VisitContract;
-import com.frevocomunicacao.tracker.database.models.Ocurrence;
-import com.frevocomunicacao.tracker.database.models.Visit;
 import com.frevocomunicacao.tracker.database.models.VisitImage;
 
 import java.util.ArrayList;
@@ -33,7 +31,6 @@ public class ImagesDataSource {
 
     public ImagesDataSource(Context context) {
         dbHelper = new DbHelper(context);
-        this.open();
     }
 
     public void open() throws SQLException {
@@ -45,6 +42,8 @@ public class ImagesDataSource {
     }
 
     public boolean create(VisitImage object) {
+        this.open();
+
         ContentValues values = new ContentValues();
         values.put(ImageContract.ImageEntry.COLUMN_FIELD_VISIT_ID, object.getVisitId());
         values.put(ImageContract.ImageEntry.COLUMN_FIELD_NAME, object.getName());
@@ -55,10 +54,14 @@ public class ImagesDataSource {
                 null,
                 values);
 
+        this.close();
+
         return insertId != 0 ? true : false;
     }
 
-    public void update(VisitImage object) {
+    public int update(VisitImage object) {
+        this.open();
+
         ContentValues values = new ContentValues();
         values.put(ImageContract.ImageEntry.COLUMN_FIELD_VISIT_ID, object.getVisitId());
         values.put(ImageContract.ImageEntry.COLUMN_FIELD_NAME, object.getName());
@@ -73,24 +76,39 @@ public class ImagesDataSource {
                 values,
                 selection,
                 selectionArgs);
+
+        this.close();
+
+        return count;
     }
 
     public void delete(VisitImage object) {
+        this.open();
+
         db.delete(ImageContract.ImageEntry.TABLE_NAME, ImageContract.ImageEntry.COLUMN_FIELD_ID
                 + " = " + object.getId(), null);
+
+        this.close();
     }
 
     public boolean exist(VisitImage object) {
+        this.open();
+
         String q = VisitContract.VisitEntry.COLUMN_FIELD_ID + " = ?";
 
         if (this.find(q, new String[]{String.valueOf(object.getId())}) != null) {
+            this.close();
             return true;
         }
+
+        this.close();
 
         return false;
     }
 
     public VisitImage find(String query, String[] args) {
+        this.open();
+
         VisitImage object = null;
 
         Cursor cursor = db.query(
@@ -110,12 +128,15 @@ public class ImagesDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return object;
     }
 
     public List<VisitImage> findAll(String query, String[] args, String sortOrder) {
+        this.open();
+
         List<VisitImage> images = new ArrayList<VisitImage>();
 
         Cursor cursor = db.query(
@@ -140,6 +161,7 @@ public class ImagesDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return images;
@@ -150,10 +172,20 @@ public class ImagesDataSource {
         VisitImage visitImage = new VisitImage();
 
         // fill data
-        visitImage.setId(cursor.getInt(0));
-        visitImage.setName(cursor.getString(1));
+        visitImage.setId(cursor.getInt(cursor.getColumnIndex(ImageContract.ImageEntry.COLUMN_FIELD_ID)));
+        visitImage.setName(cursor.getString(cursor.getColumnIndex(ImageContract.ImageEntry.COLUMN_FIELD_NAME)));
+        visitImage.setSource(cursor.getString(cursor.getColumnIndex(ImageContract.ImageEntry.COLUMN_FIELD_SOURCE)));
 
         // return object
         return visitImage;
+    }
+
+    public void truncateTable() {
+        this.open();
+
+        // truncate sql
+        db.execSQL("DELETE FROM " + CheckinContract.CheckinEntry.TABLE_NAME);
+
+        this.close();
     }
 }

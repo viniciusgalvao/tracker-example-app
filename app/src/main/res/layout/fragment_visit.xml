@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="18dp"
-        android:text="Nenhuma informação para sincronizar"
+        android:text="Nenhuma visita encontrada"
         android:gravity="center_horizontal|center_vertical"
         android:visibility="gone"/>
 

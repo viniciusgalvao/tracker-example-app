@@ -1,5 +1,6 @@
 package com.frevocomunicacao.tracker.activities;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
@@ -11,11 +12,22 @@ import android.widget.TextView;
 
 import com.frevocomunicacao.tracker.Constants;
 import com.frevocomunicacao.tracker.R;
+import com.frevocomunicacao.tracker.api.TrackerRestClientUsage;
 import com.frevocomunicacao.tracker.fragments.VisitFragment;
+import com.frevocomunicacao.tracker.utils.ConnectionDetector;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends BaseActivity {
 
     private FloatingActionButton fab;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +76,68 @@ public class MainActivity extends BaseActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_sync) {
-            // TODO: implement sync data
+            if (!ConnectionDetector.isNetworkConnected(this)) {
+                showMessage("Verifique sua conexão com a internet!");
+            } else {
+                importData();
+            }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void importData() {
+        RequestParams p = new RequestParams();
+        p.put("employee_id", prefs.getInt(Constants.PREFS_KEY_USER_EMPLOYEE_ID));
+
+        TrackerRestClientUsage.importData(p, new JsonHttpResponseHandler() {
+            @Override
+            public void onStart() {
+                showSyncProgressDialog();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+
+                try {
+                    if (response.getBoolean(Constants.RESPONSE_KEY_ERROR) == false) {
+                        JSONArray ocurrences = response.getJSONArray("ocurrences");
+                        JSONArray visits = response.getJSONArray("visits");
+
+                        // import data
+                        importOcurrences(ocurrences);
+                        importVisits(visits);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } finally {
+                    dialog.dismiss();
+                }
+
+                displayView(new VisitFragment(), null);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                if (statusCode == 404) {
+                    showMessage("Opa! endpoit do serviço não encontrado.");
+                } else if (statusCode == 500) {
+                    showMessage("Opa! não foi possível encontrar o servidor.");
+                }
+
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void showSyncProgressDialog() {
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("sincronizando informações...");
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     @Override

@@ -14,11 +14,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.frevocomunicacao.tracker.Constants;
 import com.frevocomunicacao.tracker.R;
-import com.frevocomunicacao.tracker.api.TrackerRestClientUsage;
-import com.frevocomunicacao.tracker.fragments.MyVisitFragment;
+import com.frevocomunicacao.tracker.database.datasources.CheckinsDataSource;
+import com.frevocomunicacao.tracker.database.datasources.ImagesDataSource;
+import com.frevocomunicacao.tracker.database.datasources.OcurrencesDataSource;
+import com.frevocomunicacao.tracker.database.datasources.VisitsDataSource;
+import com.frevocomunicacao.tracker.database.models.Ocurrence;
+import com.frevocomunicacao.tracker.database.models.Visit;
 import com.frevocomunicacao.tracker.fragments.VisitFragment;
 import com.frevocomunicacao.tracker.utils.PrefUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by Vinicius on 10/03/16.
@@ -69,12 +78,12 @@ public abstract class BaseActivity extends AppCompatActivity {
                 // Handle navigation view item clicks here.
                 int id = item.getItemId();
 
-                if (id == R.id.nav_home && mCurrentFragment.getClass() != VisitFragment.class) {
+                if (id == R.id.nav_home) {
                     setTitle(R.string.app_name);
-                    displayView(new VisitFragment(), null);
-                } else if (id == R.id.nav_my_visits && mCurrentFragment.getClass() != MyVisitFragment.class) {
+                    displayView(new VisitFragment(Constants.FRAGMENT_VIEW_STATUS_VISITS_LIST), null);
+                } else if (id == R.id.nav_my_visits) {
                     setTitle("Visitas Realizadas");
-                    displayView(new MyVisitFragment(), null);
+                    displayView(new VisitFragment(Constants.FRAGMENT_VIEW_STATUS_MY_VISITS_LIST), null);
                 } else if (id == R.id.nav_logout) {
                     logout();
                 }
@@ -127,8 +136,61 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void logout() {
         if (!prefs.isEmpty()) {
             prefs.empty();
+
+            VisitsDataSource dsVisit = new VisitsDataSource(getApplicationContext());
+            ImagesDataSource dsImage = new ImagesDataSource(getApplicationContext());
+            CheckinsDataSource dsCheckin = new CheckinsDataSource(getApplicationContext());
+
+            dsVisit.truncateTable();
+            dsCheckin.truncateTable();
+            dsImage.truncateTable();
         }
+
         changeActivity(LoginActivity.class, null, true);
+    }
+
+    protected void importOcurrences(JSONArray ocurrences) throws JSONException {
+        OcurrencesDataSource dsOcurrence = new OcurrencesDataSource(getApplicationContext());
+
+        for (int x = 0; x < ocurrences.length(); x++) {
+            JSONObject object = ocurrences.getJSONObject(x);
+            Ocurrence ocurrence = new Ocurrence(object.getInt("id"), object.getString("name"));
+
+            if (!dsOcurrence.exist(ocurrence)) {
+                dsOcurrence.create(ocurrence);
+            } else {
+                dsOcurrence.update(ocurrence);
+            }
+        }
+    }
+
+    protected void importVisits(JSONArray visits) throws JSONException{
+        VisitsDataSource dsVisit = new VisitsDataSource(getApplicationContext());
+
+        for (int x=0;x < visits.length();x++) {
+            JSONObject object = visits.getJSONObject(x);
+
+            Visit visit = new Visit();
+            visit.setId(object.getInt("id"));
+            visit.setEmployeeId(object.getInt("employee_id"));
+            visit.setMotive(object.getString("motive"));
+            visit.setCep(object.getString("cep"));
+            visit.setState(object.getString("state"));
+            visit.setCity(object.getString("city"));
+            visit.setAddress(object.getString("address"));
+            visit.setNeighborhood(object.getString("neighborhood"));
+            visit.setComplement(object.getString("complement"));
+            visit.setNumber(object.getString("number"));
+            visit.setReferencePoint(object.getString("reference_point"));
+            visit.setVisitStatusId(object.getInt("visit_status_id"));
+            visit.setVisitTypeId(object.getInt("visit_type_id"));
+
+            if (!dsVisit.exist(visit)) {
+                dsVisit.create(visit);
+            } else {
+                dsVisit.update(visit);
+            }
+        }
     }
 
     protected abstract int getLayoutResource();

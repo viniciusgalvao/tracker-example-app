@@ -7,7 +7,6 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -53,6 +52,11 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!prefs.isEmpty()) {
+            changeActivity(MainActivity.class, null, true);
+        }
+
         setContentView(getLayoutResource());
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -81,11 +85,6 @@ public class LoginActivity extends BaseActivity {
         mProgressView = findViewById(R.id.login_progress);
     }
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
 
         if (!ConnectionDetector.isNetworkConnected(this)) {
@@ -254,57 +253,7 @@ public class LoginActivity extends BaseActivity {
         });
     }
 
-    private void importOcurrences(JSONArray ocurrences) throws JSONException {
-        OcurrencesDataSource dsOcurrence = new OcurrencesDataSource(getApplicationContext());
-
-        for (int x = 0; x < ocurrences.length(); x++) {
-            JSONObject object = ocurrences.getJSONObject(x);
-            Ocurrence ocurrence = new Ocurrence(object.getInt("id"), object.getString("name"));
-
-            if (!dsOcurrence.exist(ocurrence)) {
-                dsOcurrence.create(ocurrence);
-            } else {
-                dsOcurrence.update(ocurrence);
-            }
-        }
-
-        dsOcurrence.close();
-    }
-
-    private void importVisits(JSONArray visits) throws JSONException{
-        VisitsDataSource dsVisit = new VisitsDataSource(getApplicationContext());
-
-        for (int x=0;x < visits.length();x++) {
-            JSONObject object = visits.getJSONObject(x);
-
-            Visit visit = new Visit();
-            visit.setId(object.getInt("id"));
-            visit.setEmployeeId(object.getInt("employee_id"));
-            visit.setMotive(object.getString("motive"));
-            visit.setCep(object.getString("cep"));
-            visit.setState(object.getString("state"));
-            visit.setCity(object.getString("city"));
-            visit.setAddress(object.getString("address"));
-            visit.setNeighborhood(object.getString("neighborhood"));
-            visit.setComplement(object.getString("complement"));
-            visit.setNumber(object.getString("number"));
-            visit.setReferencePoint(object.getString("reference_point"));
-            visit.setVisitStatusId(object.getInt("visit_status_id"));
-
-            if (!dsVisit.exist(visit)) {
-                dsVisit.create(visit);
-                Log.d("LoginActivity", "Visita Criada: " + visit.getAddress() + ", " + visit.getNumber() + " - " + visit.getCity());
-            } else {
-                Log.d("LoginActivity", "Visita Atualizada: " + visit.getAddress() + ", " + visit.getNumber() + " - " + visit.getCity());
-                dsVisit.update(visit);
-            }
-        }
-
-        dsVisit.close();
-
-    }
-
-        @Override
+    @Override
     protected int getLayoutResource() {
         return R.layout.activity_login;
     }

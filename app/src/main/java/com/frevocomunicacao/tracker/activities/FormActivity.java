@@ -1,6 +1,8 @@
 package com.frevocomunicacao.tracker.activities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -13,11 +15,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.Toast;
 
+import com.frevocomunicacao.tracker.Constants;
 import com.frevocomunicacao.tracker.R;
 import com.frevocomunicacao.tracker.adapters.ImageAdapter;
-import com.frevocomunicacao.tracker.database.DbHelper;
+import com.frevocomunicacao.tracker.database.contracts.ImageContract;
+import com.frevocomunicacao.tracker.database.contracts.OcurrenceContract;
+import com.frevocomunicacao.tracker.database.datasources.CheckinsDataSource;
+import com.frevocomunicacao.tracker.database.datasources.ImagesDataSource;
+import com.frevocomunicacao.tracker.database.datasources.OcurrencesDataSource;
+import com.frevocomunicacao.tracker.database.datasources.VisitsDataSource;
+import com.frevocomunicacao.tracker.database.models.Ocurrence;
 import com.frevocomunicacao.tracker.database.models.Visit;
 import com.frevocomunicacao.tracker.database.models.VisitImage;
 import com.frevocomunicacao.tracker.utils.GpsTracker;
@@ -49,12 +57,24 @@ public class FormActivity extends BaseActivity {
     private List<VisitImage> images;
     private ImageAdapter adapter;
 
-    // database
-    private DbHelper mDbHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // activity view mode
+        viewMode = getIntent().getExtras().getString("mode");
+
+        // actionbar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // float button
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.save);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                confirmSave();
+            }
+        });
 
         // form view
         edtAddressCep           = ((EditText) findViewById(R.id.edt_address_cep));
@@ -65,9 +85,7 @@ public class FormActivity extends BaseActivity {
         edtAddressCity          = ((EditText) findViewById(R.id.edt_address_city));
         edtAddressState         = ((EditText) findViewById(R.id.edt_address_state));
         edtAddressReferencePoint= ((EditText) findViewById(R.id.edt_address_reference_point));
-
-        // activity view mode
-        viewMode = getIntent().getExtras().getString("mode");
+        edtObservation          = ((EditText) findViewById(R.id.edt_observation));
 
         if (viewMode.equals("edit")) {
             setTitle("Check-in");
@@ -85,43 +103,42 @@ public class FormActivity extends BaseActivity {
             edtAddressState.setEnabled(false);
             edtAddressReferencePoint.setText(visit.getReferencePoint());
         } else {
-
+            visit = new Visit(); // create empty object
         }
 
         // gallery
         galleryContainer = (GridView) findViewById(R.id.galley_container);
-        images  = new ArrayList<VisitImage>();
-        adapter = new ImageAdapter(this, images);
-        galleryContainer.setAdapter(adapter);
+        buildImageGrid();
 
-        // actionbar
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // float button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.save);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Em desenvolvimento.", Toast.LENGTH_SHORT).show();
-
-            }
-        });
 
         // Make sure that GPS is enabled on the device
         tracker = new GpsTracker(this, mLocationListener);
-        isGpsEnabled();
+
 
         // spinner
         spinner = (MultiSelectSpinner) findViewById(R.id.situations_spinner);
+        fillSpinner();
 
-        // database
-        mDbHelper = new DbHelper(this);
+        if (visit.getVisitStatusId() == 3) {
+            fab.setVisibility(View.GONE);
+            edtAddressCep.setEnabled(false);
+            edtAddressNumber.setEnabled(false);
+            edtAddressComplement.setEnabled(false);
+            edtAddressReferencePoint.setEnabled(false);
+            edtObservation.setVisibility(View.GONE);
+            spinner.setEnabled(false);
+        } else {
+            isGpsEnabled();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.form, menu);
+        if (visit.getVisitStatusId() != 3) {
+            getMenuInflater().inflate(R.menu.form, menu);
+        }
+
         return true;
     }
 
@@ -146,7 +163,10 @@ public class FormActivity extends BaseActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        isGpsEnabled();
+
+        if (visit.getVisitStatusId() != 3) {
+            isGpsEnabled();
+        }
     }
 
     @Override
@@ -197,7 +217,7 @@ public class FormActivity extends BaseActivity {
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location location) {
-            if (location != null && location.getLatitude() != 0) {
+            if (location != null) {
                 // store location data
                 mLocation = location;
 
@@ -205,7 +225,7 @@ public class FormActivity extends BaseActivity {
                 dialog.dismiss();
 
                 // stop gps tracking
-                tracker.stopUsingGps();
+                //tracker.stopUsingGps();
             }
         }
 
@@ -224,6 +244,93 @@ public class FormActivity extends BaseActivity {
             //your code here
         }
     };
+
+    private void confirmSave() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(viewMode.equals("edit") ? "Salvar Visita" : "Criar Visita");
+        builder.setMessage("Você tem certeza?");
+
+        builder.setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                save();
+                dialog.dismiss();
+            }
+
+        });
+
+        builder.setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void save() {
+        VisitsDataSource dsVisit     = new VisitsDataSource(this);
+        ImagesDataSource dsImage     = new ImagesDataSource(this);
+        CheckinsDataSource dsCheckin = new CheckinsDataSource(this);
+
+        visit.setVisitStatusId(3); // 3 = Visited
+        visit.setEmployeeId(prefs.getInt(Constants.PREFS_KEY_USER_EMPLOYEE_ID));
+        visit.setCep(edtAddressCep.getText().toString());
+        visit.setAddress(edtAddress.getText().toString());
+        visit.setNumber(edtAddressNumber.getText().toString());
+        visit.setComplement(edtAddressComplement.getText().toString());
+        visit.setNeighborhood(edtAddressNeighborhood.getText().toString());
+        visit.setCity(edtAddressCity.getText().toString());
+        visit.setState(edtAddressState.getText().toString());
+        visit.setReferencePoint(edtAddressReferencePoint.getText().toString());
+//        visit.setObservation(edtObservation.getText().toString());
+
+        if (viewMode.equals("edit")) {
+            dsVisit.update(visit);
+        } else {
+            visit.setVisitTypeId(2); // set to extra visit type
+            dsVisit.create(visit); // create visit
+        }
+
+        // VisitImages
+        for (int x = 0; x < images.size(); x++) {
+            VisitImage img = images.get(x);
+            img.setVisitId((int) visit.getId());
+
+            dsImage.create(img);
+        }
+
+        changeActivity(MainActivity.class, null, true);
+    }
+
+    private void buildImageGrid() {
+        ImagesDataSource dsImage = new ImagesDataSource(this);
+
+        String query    = ImageContract.ImageEntry.COLUMN_FIELD_VISIT_ID + " = ?";
+        String[] args   = new String[]{String.valueOf((int) visit.getId())};
+
+        images          = dsImage.findAll(query, args, null);
+
+        images          = images == null ? new ArrayList<VisitImage>() : images;
+        adapter         = new ImageAdapter(this, images);
+        galleryContainer.setAdapter(adapter);
+    }
+
+    private void fillSpinner() {
+        OcurrencesDataSource dsOcurrence    = new OcurrencesDataSource(getApplicationContext());
+        List<Ocurrence> ocurrencesRecords   = dsOcurrence.findAll(null, null, OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_ID + " ASC");
+        List<String> spinnerData            = new ArrayList<String>();
+
+        for (int x = 0;x < ocurrencesRecords.size();x++) {
+            spinnerData.add(ocurrencesRecords.get(x).getName());
+        }
+
+        // fill data in spinner
+        spinner.setItems(spinnerData);
+    }
 
     @Override
     protected int getLayoutResource() {

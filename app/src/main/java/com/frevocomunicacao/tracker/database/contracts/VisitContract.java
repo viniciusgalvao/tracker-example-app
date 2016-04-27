@@ -7,21 +7,22 @@ public final class VisitContract {
     public VisitContract() {}
 
     public static abstract class VisitEntry implements BaseColumns {
-        public static final String TABLE_NAME               = "visits";
-        public static final String COLUMN_FIELD_ID          = "id";
-        public static final String COLUMN_FIELD_EMPLOYEE_ID = "employee_id";
-        public static final String COLUMN_FIELD_MOTIVE      = "motive";
-        public static final String COLUMN_FIELD_CEP         = "cep";
-        public static final String COLUMN_FIELD_STATE       = "state";
-        public static final String COLUMN_FIELD_CITY        = "city";
-        public static final String COLUMN_FIELD_ADDRESS     = "address";
-        public static final String COLUMN_FIELD_NEIGHBORHOOD= "neighborhood";
-        public static final String COLUMN_FIELD_COMPLEMENT  = "complement";
-        public static final String COLUMN_FIELD_NUMBER      = "number";
-        public static final String COLUMN_FIELD_REF_POINT   = "reference_point";
-        public static final String COLUMN_FIELD_PHONE       = "phone";
+        public static final String TABLE_NAME                   = "visits";
+        public static final String COLUMN_FIELD_ID              = "id";
+        public static final String COLUMN_FIELD_VISIT_TYPE_ID   = "visit_type_id";
+        public static final String COLUMN_FIELD_EMPLOYEE_ID     = "employee_id";
+        public static final String COLUMN_FIELD_MOTIVE          = "motive";
+        public static final String COLUMN_FIELD_CEP             = "cep";
+        public static final String COLUMN_FIELD_STATE           = "state";
+        public static final String COLUMN_FIELD_CITY            = "city";
+        public static final String COLUMN_FIELD_ADDRESS         = "address";
+        public static final String COLUMN_FIELD_NEIGHBORHOOD    = "neighborhood";
+        public static final String COLUMN_FIELD_COMPLEMENT      = "complement";
+        public static final String COLUMN_FIELD_NUMBER          = "number";
+        public static final String COLUMN_FIELD_REF_POINT       = "reference_point";
+        public static final String COLUMN_FIELD_PHONE           = "phone";
         public static final String COLUMN_FIELD_VISIT_STATUS_ID = "visit_status_id";
-        public static final String COLUMN_FIELD_DATE_FINISH = "date_finish";
+        public static final String COLUMN_FIELD_DATE_FINISH     = "date_finish";
     }
 
     private static final String TEXT_TYPE = " TEXT";
@@ -32,6 +33,7 @@ public final class VisitContract {
             "CREATE TABLE " + VisitEntry.TABLE_NAME + " (" +
                     VisitEntry._ID                          + " INTEGER PRIMARY KEY," +
                     VisitEntry.COLUMN_FIELD_ID              + INT_TYPE  + COMMA_SEP +
+                    VisitEntry.COLUMN_FIELD_VISIT_TYPE_ID   + INT_TYPE  + COMMA_SEP +
                     VisitEntry.COLUMN_FIELD_EMPLOYEE_ID     + INT_TYPE  + COMMA_SEP +
                     VisitEntry.COLUMN_FIELD_MOTIVE          + TEXT_TYPE + COMMA_SEP +
                     VisitEntry.COLUMN_FIELD_CEP             + TEXT_TYPE + COMMA_SEP +

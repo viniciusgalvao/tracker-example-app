@@ -44,36 +44,29 @@ public class VisitsAdapter extends BaseAdapter {
 
         ViewHolder mHolder;
 
-        // verifica se a view está nula
         if (convertView == null) {
-            // inflando layout para poder pegar as views
             convertView = mInflater.inflate(R.layout.item_list_visits, null);
 
-            // inflando as informações
             mHolder = new ViewHolder();
             mHolder.cep         = ((TextView) convertView.findViewById(R.id.txt_cep));
             mHolder.city_state  = ((TextView) convertView.findViewById(R.id.txt_city_state));
             mHolder.address     = ((TextView) convertView.findViewById(R.id.txt_address));
             mHolder.referencePoint = ((TextView) convertView.findViewById(R.id.txt_reference_point));
 
-            // define os itens na view
             convertView.setTag(mHolder);
         } else {
             mHolder = ((ViewHolder) convertView.getTag());
         }
 
-        // pega o registro referente a posição
         Visit visit = visits.get(position);
 
         if (visit != null) {
-            // modifica os dados
             mHolder.cep.setText(visit.getCep());
             mHolder.city_state.setText(visit.getCity() + ", " + visit.getState());
             mHolder.address.setText(visit.getSimpleAddress());
-            mHolder.referencePoint.setText('"' + visit.getReferencePoint() + '"');
+            mHolder.referencePoint.setText(visit.getReferencePoint() != "" ? '"' + visit.getReferencePoint() + '"' : "");
         }
 
-        // retorna a view com as informações
         return convertView;
     }
 

@@ -7,7 +7,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.frevocomunicacao.tracker.database.DbHelper;
-import com.frevocomunicacao.tracker.database.contracts.CheckinContract;
 import com.frevocomunicacao.tracker.database.contracts.OcurrenceContract;
 import com.frevocomunicacao.tracker.database.models.Ocurrence;
 
@@ -29,7 +28,6 @@ public class OcurrencesDataSource {
 
     public OcurrencesDataSource(Context context) {
         dbHelper = new DbHelper(context);
-        this.open();
     }
 
     public void open() throws SQLException {
@@ -41,6 +39,8 @@ public class OcurrencesDataSource {
     }
 
     public boolean create(Ocurrence object) {
+        this.open();
+
         ContentValues values = new ContentValues();
         values.put(OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_ID, object.getId());
         values.put(OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_NAME, object.getName());
@@ -50,10 +50,14 @@ public class OcurrencesDataSource {
                 null,
                 values);
 
+        this.close();
+
         return insertId != 0 ? true : false;
     }
 
-    public void update(Ocurrence object) {
+    public int update(Ocurrence object) {
+        this.open();
+
         ContentValues values = new ContentValues();
         values.put(OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_ID, object.getId());
         values.put(OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_NAME, object.getName());
@@ -67,24 +71,40 @@ public class OcurrencesDataSource {
                 values,
                 selection,
                 selectionArgs);
+
+        this.close();
+
+        return count;
     }
 
     public void delete(Ocurrence object) {
+        this.open();
+
         db.delete(OcurrenceContract.OcurrenceEntry.TABLE_NAME, OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_ID
                 + " = " + object.getId(), null);
+
+        this.close();
     }
 
     public boolean exist(Ocurrence object) {
+        this.open();
+
         String q = OcurrenceContract.OcurrenceEntry.COLUMN_FIELD_ID + " = ?";
 
         if (this.find(q, new String[]{String.valueOf(object.getId())}) != null) {
+            this.close();
+
             return true;
         }
+
+        this.close();
 
         return false;
     }
 
     public Ocurrence find(String query, String[] args) {
+        this.open();
+
         Ocurrence object = null;
 
         Cursor cursor = db.query(
@@ -103,12 +123,15 @@ public class OcurrencesDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return object;
     }
 
     public List<Ocurrence> findAll(String query, String[] args, String sortOrder) {
+        this.open();
+
         List<Ocurrence> ocurrences = new ArrayList<Ocurrence>();
 
         Cursor cursor = db.query(
@@ -133,6 +156,7 @@ public class OcurrencesDataSource {
             }
         } finally {
             cursor.close();
+            this.close();
         }
 
         return ocurrences;
@@ -148,5 +172,13 @@ public class OcurrencesDataSource {
 
         // return object
         return object;
+    }
+
+    public void truncateTable() {
+        this.open();
+
+        db.execSQL("DELETE FROM " + OcurrenceContract.OcurrenceEntry.TABLE_NAME);
+
+        this.close();
     }
 }
